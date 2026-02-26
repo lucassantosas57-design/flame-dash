@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flame Dash: O Desafio Antigravity</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="hud">
+            <div class="hud-item" id="score-container">
+                <span class="label">SCORE</span>
+                <span id="score" class="value">000000</span>
+            </div>
+            <div class="hud-mid">
+                <div id="game-title">FLAME DASH</div>
+            </div>
+            <div class="hud-item" id="lives-container">
+                <span class="label">LIVES</span>
+                <span id="lives" class="value">3</span>
+            </div>
+        </div>
+
+        <div id="overlay" class="hidden">
+            <div class="message-box">
+                <h1 id="overlay-title">GAME OVER</h1>
+                <p id="overlay-msg">Try again to master the flames!</p>
+                <button id="restart-btn">RESTART MISSION</button>
+            </div>
+        </div>
+
+        <div id="start-screen">
+            <div class="start-content">
+                <h1 class="glow-text">FLAME DASH</h1>
+                <p>O Desafio Antigravity</p>
+                <div class="controls-hint">
+                    <div><span>WASD / ARROWS</span> - Move</div>
+                    <div><span>SPACE</span> - Jump</div>
+                    <div><span>X / SHIFT</span> - Fireball (Power-up required)</div>
+                </div>
+                <button id="start-btn">START GAME</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="engine.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
