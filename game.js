@@ -31,6 +31,8 @@ class Player extends Entity {
             this.vy = this.jumpForce;
             this.grounded = false;
         }
+        // liha de chegada
+        
 
         // Apply Gravity
         this.vy += 0.8; // Engine gravity
@@ -286,7 +288,7 @@ class GameScene {
         // Win Condition
         const playerTileX = Math.floor((this.player.x + this.player.width / 2) / this.level.tileWidth);
         const playerTileY = Math.floor((this.player.y + this.player.height / 2) / this.level.tileHeight);
-        if (this.level.map[playerTileY] && this.level.map[playerTileY][playerTileX] === 3) {
+        if (this.level.map[playerTileY] && this.level.map[playerTileY][playerTileX] >= 3) {
             this.victory();
         }
     }
