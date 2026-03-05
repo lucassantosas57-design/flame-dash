@@ -32,7 +32,7 @@ class Player extends Entity {
             this.grounded = false;
         }
         // liha de chegada
-        
+
 
         // Apply Gravity
         this.vy += 0.8; // Engine gravity
@@ -137,7 +137,8 @@ class Player extends Entity {
 
         // Draw sprite
         if (assets.hero) {
-            ctx.drawImage(assets.hero, 0, 0, 100, 100, this.x - camera.x, this.y - camera.y, this.width, this.height);
+            // Draw the full hero image scaled to player size
+            ctx.drawImage(assets.hero, this.x - camera.x, this.y - camera.y, this.width, this.height);
         } else {
             ctx.fillStyle = this.isFire ? '#ff4d00' : '#00f2ff';
             ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
@@ -174,7 +175,7 @@ class Enemy extends Entity {
 
     draw(ctx, camera, assets) {
         if (assets.enemy) {
-            ctx.drawImage(assets.enemy, 0, 0, 100, 100, this.x - camera.x, this.y - camera.y, this.width, this.height);
+            ctx.drawImage(assets.enemy, this.x - camera.x, this.y - camera.y, this.width, this.height);
         } else {
             ctx.fillStyle = '#ff0055';
             ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
@@ -209,25 +210,26 @@ class Fireball extends Entity {
 class GameScene {
     constructor(engine) {
         this.engine = engine;
+        // 0: empty, 1: ground, 2: powerup, 3: finish
         this.level = new Level(40, 40, [
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-            [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1],
+            [0, 0, 0, 0, 0, 1, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 2, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 2, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1],
+            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         ]);
 
         this.player = new Player(100, 100);
         this.enemies = [
-            new Enemy(600, 280),
-            new Enemy(1200, 280),
-            new Enemy(1800, 280),
-            new Enemy(2200, 280),
+            new Enemy(600, 160),
+            new Enemy(1200, 160),
+            new Enemy(2000, 160),
+            new Enemy(2800, 160),
         ];
         this.fireballs = [];
         this.score = 0;
@@ -250,10 +252,10 @@ class GameScene {
 
             // Player vs Enemy
             if (this.player.checkCollision(enemy)) {
-                if (this.player.vy > 0 && this.player.y < enemy.y) {
+                if (this.player.vy > 0 && this.player.y < enemy.y + (enemy.height / 2)) {
                     // Stomp!
                     enemy.toRemove = true;
-                    this.player.vy = -10;
+                    this.player.vy = -12;
                     this.addScore(100);
                 } else {
                     this.player.die();
@@ -285,10 +287,15 @@ class GameScene {
         this.enemies = this.enemies.filter(e => !e.toRemove);
         this.fireballs = this.fireballs.filter(f => !f.toRemove);
 
-        // Win Condition
-        const playerTileX = Math.floor((this.player.x + this.player.width / 2) / this.level.tileWidth);
-        const playerTileY = Math.floor((this.player.y + this.player.height / 2) / this.level.tileHeight);
-        if (this.level.map[playerTileY] && this.level.map[playerTileY][playerTileX] >= 3) {
+        // Win Condition - More forgiving check
+        const pBounds = this.player.getBounds();
+        const pCenterX = (pBounds.left + pBounds.right) / 2;
+        const pCenterY = (pBounds.top + pBounds.bottom) / 2;
+
+        const tileX = Math.floor(pCenterX / this.level.tileWidth);
+        const tileY = Math.floor(pCenterY / this.level.tileHeight);
+
+        if (this.level.map[tileY] && this.level.map[tileY][tileX] === 3) {
             this.victory();
         }
     }
@@ -299,13 +306,28 @@ class GameScene {
     }
 
     draw(ctx, camera) {
+        this.drawBackground(ctx, camera);
         this.level.draw(ctx, camera, this.engine.assets);
         this.enemies.forEach(e => e.draw(ctx, camera, this.engine.assets));
         this.fireballs.forEach(f => f.draw(ctx, camera, this.engine.assets));
         this.player.draw(ctx, camera, this.engine.assets);
     }
 
+    drawBackground(ctx, camera) {
+        // Simple Parallax
+        const p1 = -camera.x * 0.2;
+
+        ctx.fillStyle = '#0d0d12';
+        ctx.fillRect(0, 0, 800, 600);
+
+        ctx.fillStyle = '#1a1a2e';
+        for (let i = 0; i < 10; i++) {
+            ctx.fillRect(p1 + (i * 400), 400, 200, 200);
+        }
+    }
+
     gameOver() {
+        if (this.isGameOver) return;
         this.isGameOver = true;
         document.getElementById('overlay').classList.remove('hidden');
         document.getElementById('overlay-title').innerText = 'GAME OVER';
@@ -313,6 +335,7 @@ class GameScene {
     }
 
     victory() {
+        if (this.isGameOver) return;
         this.isGameOver = true;
         document.getElementById('overlay').classList.remove('hidden');
         document.getElementById('overlay-title').innerText = 'VICTORY!';

@@ -157,20 +157,43 @@ class Level {
 
     drawTile(ctx, type, x, y, assets) {
         const size = this.tileWidth;
+        if (!assets.tiles && type !== 3) {
+            // Fallback colors if no assets
+            ctx.fillStyle = type === 1 ? '#4d4d4d' : '#ff9e00';
+            ctx.fillRect(x, y, size, size);
+            return;
+        }
+
         if (type === 1) { // Ground
-            ctx.drawImage(assets.tiles, 0, 0, 32, 32, x, y, size, size);
+            // Check if it's a spritesheet or single image
+            if (assets.tiles && assets.tiles.width > 32) {
+                ctx.drawImage(assets.tiles, 0, 0, 32, 32, x, y, size, size);
+            } else if (assets.tiles) {
+                ctx.drawImage(assets.tiles, x, y, size, size);
+            }
         } else if (type === 2) { // ? Block
-            ctx.drawImage(assets.tiles, 32, 0, 32, 32, x, y, size, size);
+            if (assets.tiles && assets.tiles.width > 32) {
+                ctx.drawImage(assets.tiles, 32, 0, 32, 32, x, y, size, size);
+            } else {
+                ctx.fillStyle = '#ff9e00';
+                ctx.fillRect(x, y, size, size);
+                ctx.strokeStyle = '#fff';
+                ctx.strokeRect(x + 5, y + 5, size - 10, size - 10);
+            }
         } else if (type === 3) { // Finish Flag
-            ctx.fillStyle = '#ff4d00';
-            ctx.beginPath();
-            ctx.moveTo(x + size / 2, y);
-            ctx.lineTo(x + size, y + size / 4);
-            ctx.lineTo(x + size / 2, y + size / 2);
-            ctx.closePath();
-            ctx.fill();
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(x + size / 2 - 2, y, 4, size);
+            if (assets.tiles && assets.tiles.width > 64) {
+                ctx.drawImage(assets.tiles, 64, 0, 32, 32, x, y, size, size);
+            } else {
+                ctx.fillStyle = '#ff4d00';
+                ctx.beginPath();
+                ctx.moveTo(x + size / 2, y);
+                ctx.lineTo(x + size, y + size / 4);
+                ctx.lineTo(x + size / 2, y + size / 2);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(x + size / 2 - 2, y, 4, size);
+            }
         }
     }
 }
