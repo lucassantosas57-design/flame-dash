@@ -158,35 +158,33 @@ class Level {
     drawTile(ctx, type, x, y, assets) {
         const size = this.tileWidth;
 
-        // Use texture if available
-        if (type === 1 && assets.tiles) { // Ground
-            ctx.drawImage(assets.tiles, x, y, size, size);
-            return;
-        } else if (type === 2 && assets.tiles) { // ? Block
-            // If it's a spritesheet, maybe it's at offset 32. But if not working, let's use a distinct look.
-            ctx.fillStyle = '#ff9e00';
+        if (!assets.tiles) {
+            ctx.fillStyle = type === 1 ? '#4d4d4d' : type === 2 ? '#ff9e00' : '#ff4d00';
             ctx.fillRect(x, y, size, size);
-            ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(x + 5, y + 5, size - 10, size - 10);
-            return;
-        } else if (type === 3) { // Finish Flag
-            ctx.fillStyle = '#ff4d00';
-            ctx.beginPath();
-            ctx.moveTo(x + size / 2, y);
-            ctx.lineTo(x + size, y + size / 4);
-            ctx.lineTo(x + size / 2, y + size / 2);
-            ctx.closePath();
-            ctx.fill();
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(x + size / 2 - 2, y, 4, size);
             return;
         }
 
-        // Fallback for ground if no texture
-        if (type === 1) {
-            ctx.fillStyle = '#4d4d4d';
-            ctx.fillRect(x, y, size, size);
+        // Standard 2D platformer tilesheet assumption: 32x32 tiles
+        if (type === 1) { // Ground
+            ctx.drawImage(assets.tiles, 0, 0, 32, 32, x, y, size, size);
+        } else if (type === 2) { // ? Block (Powerup)
+            ctx.drawImage(assets.tiles, 32, 0, 32, 32, x, y, size, size);
+        } else if (type === 3) { // Finish Flag
+            // If the flag is at index 2 (64px)
+            if (assets.tiles.width >= 96) {
+                ctx.drawImage(assets.tiles, 64, 0, 32, 32, x, y, size, size);
+            } else {
+                // Fallback procedural flag
+                ctx.fillStyle = '#ff4d00';
+                ctx.beginPath();
+                ctx.moveTo(x + size / 2, y);
+                ctx.lineTo(x + size, y + size / 4);
+                ctx.lineTo(x + size / 2, y + size / 2);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(x + size / 2 - 2, y, 4, size);
+            }
         }
     }
 }
