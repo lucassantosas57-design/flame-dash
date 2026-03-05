@@ -157,34 +157,63 @@ class Level {
 
     drawTile(ctx, type, x, y, assets) {
         const size = this.tileWidth;
+        const img = assets.tiles;
 
-        if (!assets.tiles) {
-            ctx.fillStyle = type === 1 ? '#4d4d4d' : type === 2 ? '#ff9e00' : '#ff4d00';
-            ctx.fillRect(x, y, size, size);
-            return;
-        }
-
-        // Standard 2D platformer tilesheet assumption: 32x32 tiles
+        // Base procedural rendering (always looks good)
         if (type === 1) { // Ground
-            ctx.drawImage(assets.tiles, 0, 0, 32, 32, x, y, size, size);
-        } else if (type === 2) { // ? Block (Powerup)
-            ctx.drawImage(assets.tiles, 32, 0, 32, 32, x, y, size, size);
-        } else if (type === 3) { // Finish Flag
-            // If the flag is at index 2 (64px)
-            if (assets.tiles.width >= 96) {
-                ctx.drawImage(assets.tiles, 64, 0, 32, 32, x, y, size, size);
+            if (img) {
+                let tw = img.width / 3;
+                let th = img.height;
+                ctx.drawImage(img, 0, 0, tw, th, x, y, size, size);
             } else {
-                // Fallback procedural flag
-                ctx.fillStyle = '#ff4d00';
-                ctx.beginPath();
-                ctx.moveTo(x + size / 2, y);
-                ctx.lineTo(x + size, y + size / 4);
-                ctx.lineTo(x + size / 2, y + size / 2);
-                ctx.closePath();
-                ctx.fill();
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(x + size / 2 - 2, y, 4, size);
+                ctx.fillStyle = '#1a1a2e';
+                ctx.fillRect(x, y, size, size);
+                ctx.strokeStyle = '#2a2a4a';
+                ctx.strokeRect(x, y, size, size);
             }
+        }
+        else if (type === 2) { // Powerup Block
+            // Premium Glowing Procedural Block
+            ctx.save();
+            ctx.fillStyle = '#ff9e00';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#ff4d00';
+            ctx.fillRect(x + 4, y + 4, size - 8, size - 8);
+
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x + 8, y + 8, size - 16, size - 16);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 20px Outfit';
+            ctx.textAlign = 'center';
+            ctx.fillText('?', x + size / 2, y + size / 2 + 7);
+            ctx.restore();
+
+            // Overlay texture if available
+            if (img && img.width >= 64) {
+                let tw = img.width / 3;
+                ctx.globalAlpha = 0.5;
+                ctx.drawImage(img, tw, 0, tw, img.height, x + 4, y + 4, size - 8, size - 8);
+                ctx.globalAlpha = 1.0;
+            }
+        }
+        else if (type === 3) { // Finish Flag
+            // Force procedural flag to ensure it's ALWAYS visible
+            ctx.save();
+            ctx.fillStyle = '#ff4d00';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#ff0000';
+            ctx.beginPath();
+            ctx.moveTo(x + size / 4, y);
+            ctx.lineTo(x + size, y + size / 3);
+            ctx.lineTo(x + size / 4, y + size / 1.5);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(x + size / 4 - 2, y, 4, size);
+            ctx.restore();
         }
     }
 }
