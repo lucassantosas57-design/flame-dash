@@ -1,5 +1,5 @@
 /**
- * Antigravity Engine Core
+ * Antigravity Engine Core.
  * Specialized for 2D Platformers
  */
 
@@ -28,9 +28,20 @@ class AntigravityEngine {
             return new Promise((resolve) => {
                 const img = new Image();
                 img.src = url;
+                img.crossOrigin = 'Anonymous';
                 img.onload = () => {
-                    this.assets[name] = img;
-                    resolve();
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+
+                    const newImg = new Image();
+                    newImg.src = canvas.toDataURL(); // Use directly without pixel manipulation
+                    newImg.onload = () => {
+                        this.assets[name] = newImg;
+                        resolve();
+                    };
                 };
             });
         });
@@ -157,20 +168,28 @@ class Level {
 
     drawTile(ctx, type, x, y, assets) {
         const size = this.tileWidth;
-        if (type === 1) { // Ground
-            ctx.drawImage(assets.tiles, 0, 0, 32, 32, x, y, size, size);
+        // Tile size in source is 128x128. They seem centered in the 512x512 sheet.
+        const offY = 192;
+        if (type === 1) { // Ground (Grass)
+            ctx.drawImage(assets.tiles, 0, offY, 128, 128, x, y, size, size);
         } else if (type === 2) { // ? Block
-            ctx.drawImage(assets.tiles, 32, 0, 32, 32, x, y, size, size);
+            ctx.drawImage(assets.tiles, 384, offY, 128, 128, x, y, size, size);
         } else if (type === 3) { // Finish Flag
+            // Draw a more "premium" flag
             ctx.fillStyle = '#ff4d00';
             ctx.beginPath();
-            ctx.moveTo(x + size / 2, y);
-            ctx.lineTo(x + size, y + size / 4);
-            ctx.lineTo(x + size / 2, y + size / 2);
+            ctx.moveTo(x + size * 0.4, y);
+            ctx.lineTo(x + size, y + size * 0.25);
+            ctx.lineTo(x + size * 0.4, y + size * 0.5);
             ctx.closePath();
             ctx.fill();
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(x + size / 2 - 2, y, 4, size);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(x + size * 0.3, y, 6, size);
+
+            // Add a little glow
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#ff4d00';
         }
     }
 }

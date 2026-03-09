@@ -1,5 +1,5 @@
 /**
- * Flame Dash: Game Logic
+ * Flame Dash: Game Logic.
  */
 
 class Player extends Entity {
@@ -91,11 +91,13 @@ class Player extends Entity {
         let centerY = Math.floor((this.y + this.height / 2) / level.tileHeight);
 
         if (this.vx > 0) {
-            if (level.map[centerY] && level.map[centerY][rightX] !== 0) {
+            const tileValue = level.map[centerY] && level.map[centerY][rightX];
+            if (tileValue && tileValue !== 0 && tileValue !== 3) {
                 this.x = rightX * level.tileWidth - this.width;
             }
         } else if (this.vx < 0) {
-            if (level.map[centerY] && level.map[centerY][leftX] !== 0) {
+            const tileValue = level.map[centerY] && level.map[centerY][leftX];
+            if (tileValue && tileValue !== 0 && tileValue !== 3) {
                 this.x = (leftX + 1) * level.tileWidth;
             }
         }
@@ -135,7 +137,10 @@ class Player extends Entity {
 
         // Draw sprite
         if (assets.hero) {
-            ctx.drawImage(assets.hero, 0, 0, 100, 100, this.x - camera.x, this.y - camera.y, this.width, this.height);
+            // Cropping the center 256x256 of the hero texture to remove the large border
+            const sw = assets.hero.width;
+            const sh = assets.hero.height;
+            ctx.drawImage(assets.hero, sw * 0.25, sh * 0.25, sw * 0.5, sh * 0.5, this.x - camera.x, this.y - camera.y, this.width, this.height);
         } else {
             ctx.fillStyle = this.isFire ? '#ff4d00' : '#00f2ff';
             ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
@@ -172,7 +177,8 @@ class Enemy extends Entity {
 
     draw(ctx, camera, assets) {
         if (assets.enemy) {
-            ctx.drawImage(assets.enemy, 0, 0, 100, 100, this.x - camera.x, this.y - camera.y, this.width, this.height);
+            // Harvesting the first frame from the 4x4 slime sheet (128x128)
+            ctx.drawImage(assets.enemy, 0, 0, 128, 128, this.x - camera.x, this.y - camera.y, this.width, this.height);
         } else {
             ctx.fillStyle = '#ff0055';
             ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
@@ -211,11 +217,11 @@ class GameScene {
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+            [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-            [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+            [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 3],
             [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         ]);
@@ -283,10 +289,11 @@ class GameScene {
         this.enemies = this.enemies.filter(e => !e.toRemove);
         this.fireballs = this.fireballs.filter(f => !f.toRemove);
 
-        // Win Condition
-        const playerTileX = Math.floor((this.player.x + this.player.width / 2) / this.level.tileWidth);
-        const playerTileY = Math.floor((this.player.y + this.player.height / 2) / this.level.tileHeight);
-        if (this.level.map[playerTileY] && this.level.map[playerTileY][playerTileX] === 3) {
+        // Win Condition - Flag is at x: 48 * 40(1920), y: 7 * 40(280)
+        // Creating a dummy entity to represent the flag bounds for easy AABB testing (Updated)
+        const flagHitbox = new Entity(48 * this.level.tileWidth + 10, 7 * this.level.tileHeight, 20, this.level.tileHeight);
+
+        if (this.player.checkCollision(flagHitbox)) {
             this.victory();
         }
     }
@@ -313,8 +320,8 @@ class GameScene {
     victory() {
         this.isGameOver = true;
         document.getElementById('overlay').classList.remove('hidden');
-        document.getElementById('overlay-title').innerText = 'VICTORY!';
-        document.getElementById('overlay-msg').innerText = `You mastered the flames! Final Score: ${this.score}`;
+        document.getElementById('overlay-title').innerText = 'você ganhou!';
+        document.getElementById('overlay-msg').innerText = `Você dominou as chamas! Pontuação: ${this.score}`;
     }
 }
 
