@@ -161,11 +161,13 @@ class Level {
 
     drawTile(ctx, type, x, y, assets) {
         const size = this.tileWidth;
-        const offY = 192;
+        const offY = 0; // Removing the old offY
+        const sliceSize = 213; // 640 / 3
+
         if (type === 1) { // Ground (Grass)
-            ctx.drawImage(assets.tiles, 0, offY, 128, 128, x, y, size, size);
+            ctx.drawImage(assets.tiles, 0, 0, sliceSize, sliceSize, x, y, size, size);
         } else if (type === 2) { // ? Block
-            ctx.drawImage(assets.tiles, 384, offY, 128, 128, x, y, size, size);
+            ctx.drawImage(assets.tiles, sliceSize * 2, 0, sliceSize, sliceSize, x, y, size, size);
         } else if (type === 3) { // Finish Flag
             // Draw a more "premium" flag
             ctx.beginPath();

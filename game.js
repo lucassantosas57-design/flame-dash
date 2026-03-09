@@ -145,10 +145,8 @@ class Player extends Entity {
 
         // Draw sprite
         if (assets.hero) {
-            // Cropping the center 256x256 of the hero texture to remove the large border
-            const sw = assets.hero.width;
-            const sh = assets.hero.height;
-            ctx.drawImage(assets.hero, sw * 0.25, sh * 0.25, sw * 0.5, sh * 0.5, this.x - camera.x, this.y - camera.y, this.width, this.height);
+            // Keep margins since the source image is already nicely centered padding 10-20% usually. Let's just frame it full
+            ctx.drawImage(assets.hero, 0, 0, assets.hero.width, assets.hero.height, this.x - camera.x - 10, this.y - camera.y - 10, this.width + 20, this.height + 20);
         } else {
             ctx.fillStyle = this.isFire ? '#ff4d00' : '#00f2ff';
             ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
@@ -209,8 +207,8 @@ class Enemy extends Entity {
 
     draw(ctx, camera, assets) {
         if (assets.enemy) {
-            // Harvesting the first frame from the 4x4 slime sheet (128x128)
-            ctx.drawImage(assets.enemy, 0, 0, 128, 128, this.x - camera.x, this.y - camera.y, this.width, this.height);
+            // Harvesting the first frame from the 4x4 slime sheet (160x160 for a 640x640 image)
+            ctx.drawImage(assets.enemy, 0, 0, 160, 160, this.x - camera.x - 5, this.y - camera.y - 5, this.width + 10, this.height + 10);
         } else {
             ctx.fillStyle = '#ff0055';
             ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
@@ -232,7 +230,7 @@ class Fireball extends Entity {
 
     draw(ctx, camera, assets) {
         if (assets.fireball) {
-            ctx.drawImage(assets.fireball, 0, 0, 100, 100, this.x - camera.x, this.y - camera.y, this.width, this.height);
+            ctx.drawImage(assets.fireball, 0, 0, assets.fireball.width, assets.fireball.height, this.x - camera.x - 5, this.y - camera.y - 5, this.width + 10, this.height + 10);
         } else {
             ctx.fillStyle = '#ff9e00';
             ctx.beginPath();
@@ -256,8 +254,8 @@ class GameScene {
             [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-            [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 3],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
             [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...Array(60).fill(0)],
