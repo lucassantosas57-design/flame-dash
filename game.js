@@ -346,23 +346,11 @@ class GameScene {
         this.enemies = this.enemies.filter(e => !e.toRemove);
         this.fireballs = this.fireballs.filter(f => !f.toRemove);
 
-<<<<<<< HEAD
         // Win Condition - Flag is at x: 48 * 40(1920), y: 7 * 40(280)
-        // Creating a dummy entity to represent the flag bounds for easy AABB testing (Updated)
+        // Creating a dummy entity to represent the flag bounds for easy AABB testing
         const flagHitbox = new Entity(48 * this.level.tileWidth + 10, 7 * this.level.tileHeight, 20, this.level.tileHeight);
 
         if (this.player.checkCollision(flagHitbox)) {
-=======
-        // Win Condition - More forgiving check
-        const pBounds = this.player.getBounds();
-        const pCenterX = (pBounds.left + pBounds.right) / 2;
-        const pCenterY = (pBounds.top + pBounds.bottom) / 2;
-
-        const tileX = Math.floor(pCenterX / this.level.tileWidth);
-        const tileY = Math.floor(pCenterY / this.level.tileHeight);
-
-        if (this.level.map[tileY] && this.level.map[tileY][tileX] === 3) {
->>>>>>> eb8f636bd87fae22d2f310aef11021bd7e6de31f
             this.victory();
         }
     }
