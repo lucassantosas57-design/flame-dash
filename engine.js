@@ -27,22 +27,15 @@ class AntigravityEngine {
         const promises = Object.entries(assetManifest).map(([name, url]) => {
             return new Promise((resolve) => {
                 const img = new Image();
-                img.src = url;
-                img.crossOrigin = 'Anonymous';
                 img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-
-                    const newImg = new Image();
-                    newImg.src = canvas.toDataURL(); // Use directly without pixel manipulation
-                    newImg.onload = () => {
-                        this.assets[name] = newImg;
-                        resolve();
-                    };
+                    this.assets[name] = img;
+                    resolve();
                 };
+                img.onerror = (e) => {
+                    console.error(`Failed to load asset ${name} at ${url}`, e);
+                    resolve(); // Resolve anyway so GameScene still starts
+                };
+                img.src = url;
             });
         });
         await Promise.all(promises);
