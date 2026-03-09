@@ -145,14 +145,10 @@ class Player extends Entity {
 
         // Draw sprite
         if (assets.hero) {
-<<<<<<< HEAD
             // Cropping the center 256x256 of the hero texture to remove the large border
             const sw = assets.hero.width;
             const sh = assets.hero.height;
             ctx.drawImage(assets.hero, sw * 0.25, sh * 0.25, sw * 0.5, sh * 0.5, this.x - camera.x, this.y - camera.y, this.width, this.height);
-=======
-            ctx.drawImage(assets.hero, this.x - camera.x, this.y - camera.y, this.width, this.height);
->>>>>>> eb8f636bd87fae22d2f310aef11021bd7e6de31f
         } else {
             ctx.fillStyle = this.isFire ? '#ff4d00' : '#00f2ff';
             ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
@@ -213,12 +209,8 @@ class Enemy extends Entity {
 
     draw(ctx, camera, assets) {
         if (assets.enemy) {
-<<<<<<< HEAD
             // Harvesting the first frame from the 4x4 slime sheet (128x128)
             ctx.drawImage(assets.enemy, 0, 0, 128, 128, this.x - camera.x, this.y - camera.y, this.width, this.height);
-=======
-            ctx.drawImage(assets.enemy, this.x - camera.x, this.y - camera.y, this.width, this.height);
->>>>>>> eb8f636bd87fae22d2f310aef11021bd7e6de31f
         } else {
             ctx.fillStyle = '#ff0055';
             ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
@@ -258,7 +250,6 @@ class GameScene {
         // Row 7: Flag/Items on floor
         // Row 4/5: Floating platforms & Powerups
         this.level = new Level(40, 40, [
-<<<<<<< HEAD
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -269,7 +260,6 @@ class GameScene {
             [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 3],
             [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-=======
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...Array(60).fill(0)],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...Array(60).fill(0)],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...Array(60).fill(0)],
@@ -280,7 +270,6 @@ class GameScene {
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0],
             [1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
->>>>>>> eb8f636bd87fae22d2f310aef11021bd7e6de31f
         ]);
 
         this.player = new Player(100, 100);
