@@ -79,6 +79,19 @@ canvas {
     text-shadow: 0 0 10px rgba(255, 77, 0, 0.5);
 }
 
+#level-display {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--secondary-color);
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+#level-display #level {
+    color: #ffffff;
+}
+
 .label {
     font-size: 0.7rem;
     font-weight: 400;

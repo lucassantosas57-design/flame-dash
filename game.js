@@ -240,47 +240,132 @@ class Fireball extends Entity {
     }
 }
 
+/**
+ * Generates a random level map and enemy positions.
+ * Difficulty scales with levelNum (more gaps, more enemies).
+ */
+function generateLevel(levelNum) {
+    const COLS = 50;
+    const r = (fill = 0) => Array(COLS).fill(fill);
+
+    // 14 rows: 0-2 sky, 3 powerups, 4 empty, 5 mid-platforms, 6 empty,
+    // 7 low-platforms+flag, 8-9 ground, 10-13 below
+    const map = [
+        r(), r(), r(),   // rows 0-2: sky
+        r(),             // row 3: powerup blocks
+        r(),             // row 4: empty
+        r(),             // row 5: mid-air platforms
+        r(),             // row 6: empty
+        r(),             // row 7: low platforms + flag
+        r(1), r(1),      // rows 8-9: ground (solid)
+        r(), r(), r(), r() // rows 10-13: void
+    ];
+
+    // === Gaps in ground (rows 8 and 9) ===
+    const numGaps = Math.min(1 + Math.floor(levelNum / 2), 3);
+    const gapWidth = levelNum >= 4 ? 4 : 3;
+    const SAFE_START = 7;
+    const SAFE_END = 5;
+    const gaps = [];
+    for (let g = 0; g < numGaps; g++) {
+        let attempts = 0;
+        while (attempts < 30) {
+            const gStart = SAFE_START + Math.floor(Math.random() * (COLS - SAFE_START - SAFE_END - gapWidth));
+            const tooClose = gaps.some(pos => Math.abs(pos - gStart) < 9);
+            if (!tooClose) {
+                gaps.push(gStart);
+                for (let rr = 8; rr <= 9; rr++)
+                    for (let c = gStart; c < gStart + gapWidth; c++)
+                        map[rr][c] = 0;
+                break;
+            }
+            attempts++;
+        }
+    }
+
+    // === Stepping stone in each gap (row 7) ===
+    for (const gStart of gaps) {
+        const mid = Math.floor(gStart + gapWidth / 2);
+        if (mid > 0 && mid < COLS - 1) map[7][mid] = 1;
+    }
+
+    // === Random low platforms (row 7) ===
+    const numLowPlats = 1 + Math.floor(Math.random() * 2);
+    for (let p = 0; p < numLowPlats; p++) {
+        const col = 6 + Math.floor(Math.random() * (COLS - 16));
+        if (map[8][col] === 1) {
+            for (let c = col; c < col + 2 && c < COLS - 2; c++) map[7][c] = 1;
+        }
+    }
+
+    // === Mid-air platforms (row 5) ===
+    const numHighPlats = 2 + Math.floor(Math.random() * 2);
+    for (let p = 0; p < numHighPlats; p++) {
+        const col = 5 + Math.floor(Math.random() * (COLS - 12));
+        for (let c = col; c < col + 3 && c < COLS - 2; c++) map[5][c] = 1;
+    }
+
+    // === Powerup blocks (row 3) - max 3, always above solid ground ===
+    let placed = 0, pAttempts = 0;
+    while (placed < 3 && pAttempts < 60) {
+        const col = 3 + Math.floor(Math.random() * (COLS - 6));
+        if (map[8][col] === 1 && map[3][col] === 0) {
+            map[3][col] = 2;
+            placed++;
+        }
+        pAttempts++;
+    }
+
+    // === Flag at the end (row 7, col 48) -- always on solid ground ===
+    map[7][48] = 3;
+    for (let c = 46; c <= 49; c++) { map[8][c] = 1; map[9][c] = 1; }
+
+    // === Enemies on solid ground ===
+    const numEnemies = Math.min(2 + levelNum, 6);
+    const enemyPositions = [];
+    let eAttempts = 0;
+    while (enemyPositions.length < numEnemies && eAttempts < 100) {
+        const col = 8 + Math.floor(Math.random() * (COLS - 16));
+        if (map[8][col] === 1 && map[8][col + 1] === 1) {
+            const x = col * 40;
+            const y = 7 * 40;
+            const tooClose = enemyPositions.some(e => Math.abs(e.x - x) < 200);
+            if (!tooClose) enemyPositions.push({ x, y });
+        }
+        eAttempts++;
+    }
+
+    return { map, enemyPositions };
+}
+
 class GameScene {
-    constructor(engine) {
+    constructor(engine, levelNum = 1, inheritedLives = 3, inheritedScore = 0) {
         this.engine = engine;
-        // Map layout:
-        // Row 8: Main ground
-        // Row 7: Flag/Items on floor
-        // Row 4/5: Floating platforms & Powerups
-        this.level = new Level(40, 40, [
-            Array(50).fill(0),
-            Array(50).fill(0),
-            Array(50).fill(0),
-            [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            Array(50).fill(0),
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            Array(50).fill(0),
-            [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0],
-            [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            Array(50).fill(0),
-            Array(50).fill(0),
-            Array(50).fill(0),
-            Array(50).fill(0),
-            Array(50).fill(0)
-        ]);
+        this.levelNum = levelNum;
+
+        const { map, enemyPositions } = generateLevel(levelNum);
+        this.level = new Level(40, 40, map);
 
         this.player = new Player(100, 100);
-        this.enemies = [
-            new Enemy(400, 280),
-            new Enemy(800, 160),
-            new Enemy(1400, 280),
-            new Enemy(2200, 280),
-        ];
+        this.player.lives = inheritedLives;
+
+        this.enemies = enemyPositions.map(pos => new Enemy(pos.x, pos.y));
         this.fireballs = [];
-        this.score = 0;
+        this.score = inheritedScore;
         this.isGameOver = false;
+        this.isTransitioning = false;
+
+        // Sync HUD
+        document.getElementById('lives').innerText = inheritedLives;
+        document.getElementById('score').innerText = inheritedScore.toString().padStart(6, '0');
+        const lvlEl = document.getElementById('level');
+        if (lvlEl) lvlEl.innerText = levelNum;
 
         window.currentGame = this;
     }
 
     update(dt, input) {
-        if (this.isGameOver) return;
+        if (this.isGameOver || this.isTransitioning) return;
 
         this.player.update(dt, input, this.level);
 
@@ -366,17 +451,30 @@ class GameScene {
     gameOver() {
         if (this.isGameOver) return;
         this.isGameOver = true;
+        document.getElementById('restart-btn').style.display = '';
         document.getElementById('overlay').classList.remove('hidden');
         document.getElementById('overlay-title').innerText = 'GAME OVER';
         document.getElementById('overlay-msg').innerText = 'The flames consumed you...';
     }
 
     victory() {
-        if (this.isGameOver) return;
-        this.isGameOver = true;
+        if (this.isGameOver || this.isTransitioning) return;
+        this.isTransitioning = true;
         document.getElementById('overlay').classList.remove('hidden');
-        document.getElementById('overlay-title').innerText = 'você ganhou!';
-        document.getElementById('overlay-msg').innerText = `Você dominou as chamas! Pontuação: ${this.score}`;
+        document.getElementById('overlay-title').innerText = '🔥 FASE CONCLUÍDA!';
+        document.getElementById('overlay-msg').innerText = `Você passou de fase! Preparando fase ${this.levelNum + 1}...`;
+        document.getElementById('restart-btn').style.display = 'none';
+
+        setTimeout(() => {
+            document.getElementById('overlay').classList.add('hidden');
+            document.getElementById('restart-btn').style.display = '';
+            this.engine.currentScene = new GameScene(
+                this.engine,
+                this.levelNum + 1,
+                this.player.lives,
+                this.score
+            );
+        }, 2500);
     }
 }
 
