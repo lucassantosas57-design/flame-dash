@@ -283,12 +283,6 @@ function generateLevel(levelNum) {
         }
     }
 
-    // === Stepping stone in each gap (row 7) ===
-    for (const gStart of gaps) {
-        const mid = Math.floor(gStart + gapWidth / 2);
-        if (mid > 0 && mid < COLS - 1) map[7][mid] = 1;
-    }
-
     // === Random low platforms (row 7) ===
     const numLowPlats = 1 + Math.floor(Math.random() * 2);
     for (let p = 0; p < numLowPlats; p++) {
